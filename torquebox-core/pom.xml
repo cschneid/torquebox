@@ -199,6 +199,13 @@
       </exclusions>
     </dependency>
 
+    <!-- Comet -->
+    <dependency>
+      <groupId>org.jboss.netty.handler.codec</groupId>
+      <artifactId>bayeux4netty</artifactId>
+      <version>${bayeux4netty.version}</version>
+    </dependency>
+
     <!-- Testing -->
     <dependency>
       <groupId>junit</groupId>

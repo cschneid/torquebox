@@ -4,6 +4,7 @@
         <path name=""/>
         <metaDataPath>
             <path name="META-INF"/>
+            <path name="lib/dependencies/netty.jar/META-INF"/>
         </metaDataPath>
         <classpath>
             <path name="lib/core/"         suffixes=".jar"/>

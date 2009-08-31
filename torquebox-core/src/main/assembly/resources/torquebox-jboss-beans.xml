@@ -22,11 +22,18 @@
   <bean name="RubyRackApplicationPoolDeployer"        class="org.torquebox.ruby.enterprise.web.rack.deployers.RubyRackApplicationPoolDeployer"/>
   <bean name="RackWebApplicationDeployer"             class="org.torquebox.ruby.enterprise.web.rack.deployers.RackWebApplicationDeployer"/>
 
+  <!-- Comet -->
+  <bean name="CometApplicationDeployer"             class="org.torquebox.ruby.enterprise.web.comet.deployers.CometApplicationDeployer">
+    <property name="channelFactory">
+      <inject bean="org.jboss.netty.channel.socket.ServerSocketChannelFactory"/>
+    </property>
+  </bean>
+
   <!-- SIP Servlets -->
   <bean name="SipYamlParsingDeployer"                 class="org.torquebox.ruby.enterprise.sip.deployers.SipYamlParsingDeployer"/>
   <bean name="SipRubyControllerDeployer"              class="org.torquebox.ruby.enterprise.sip.deployers.SipRubyControllerDeployer"/>
   <bean name="ConvergedSipRackWebApplicationDeployer" class="org.torquebox.ruby.enterprise.sip.deployers.ConvergedSipRackWebApplicationDeployer">
-  	<property name="kernel"><inject bean="jboss.kernel:service=Kernel"/></property>
+    <property name="kernel"><inject bean="jboss.kernel:service=Kernel"/></property>
   </bean>
 
   <!-- Runtime factories -->
