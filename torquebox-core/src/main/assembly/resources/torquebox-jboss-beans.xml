@@ -23,11 +23,14 @@
   <bean name="RackWebApplicationDeployer"             class="org.torquebox.ruby.enterprise.web.rack.deployers.RackWebApplicationDeployer"/>
 
   <!-- Comet -->
+<!--
   <bean name="CometApplicationDeployer"             class="org.torquebox.ruby.enterprise.web.comet.deployers.CometApplicationDeployer">
     <property name="channelFactory">
       <inject bean="org.jboss.netty.channel.socket.ServerSocketChannelFactory"/>
     </property>
   </bean>
+  <bean name="CometPump"             class="org.torquebox.ruby.enterprise.web.comet.bayeux.Pump"/>
+-->
 
   <!-- SIP Servlets -->
   <bean name="SipYamlParsingDeployer"                 class="org.torquebox.ruby.enterprise.sip.deployers.SipYamlParsingDeployer"/>

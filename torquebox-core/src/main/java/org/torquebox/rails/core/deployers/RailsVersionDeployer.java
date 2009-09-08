@@ -98,6 +98,8 @@ public class RailsVersionDeployer extends AbstractParsingDeployer {
 							if (matcher.matches()) {
 								String value = matcher.group(1).trim();
 								tiny = new Integer(value);
+							} else {
+								tiny = new Integer( 0 );
 							}
 						}
 					}

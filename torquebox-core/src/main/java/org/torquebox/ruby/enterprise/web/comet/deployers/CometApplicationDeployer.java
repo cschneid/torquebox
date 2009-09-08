@@ -7,6 +7,7 @@ import org.jboss.deployers.vfs.spi.deployer.AbstractSimpleVFSRealDeployer;
 import org.jboss.deployers.vfs.spi.structure.VFSDeploymentUnit;
 import org.jboss.netty.channel.ChannelFactory;
 import org.jboss.virtual.VirtualFile;
+import org.torquebox.ruby.enterprise.web.comet.CometServer;
 import org.torquebox.ruby.enterprise.web.rack.metadata.RackWebApplicationMetaData;
 
 public class CometApplicationDeployer extends AbstractSimpleVFSRealDeployer<RackWebApplicationMetaData> {
