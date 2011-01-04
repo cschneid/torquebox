@@ -38,7 +38,7 @@ describe "IO extensions for VFS" do
         when :relative
           prefix = "./#{TEST_DATA_BASE}"
         when :absolute
-          prefix = File.expand_path( File.join( File.dirname( __FILE__ ), '..', TEST_DATA_BASE ) )
+          prefix = fix_windows_path( File.expand_path( File.join( File.dirname( __FILE__ ), '..', TEST_DATA_BASE ) ) )
       end
 
       it "should allow reading of regular files" do

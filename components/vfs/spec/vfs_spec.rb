@@ -12,19 +12,19 @@ describe "VFS path resolution" do
 
   describe "resolve_path_url" do
     it "should prefix relative paths with the current dir" do
-      cwd = Dir.pwd
+      cwd = fix_windows_path( Dir.pwd )
       path = VFS.resolve_path_url( "foo/bar" )
       path.should match /^vfs:#{cwd}\/foo\/bar$/
     end
 
     it "should not prefix absolute paths with the current dir" do
       path = VFS.resolve_path_url( "/foo/bar" )
-      path.should match /^vfs:\/foo\/bar$/
+      path.should match %r(^vfs:/foo/bar$)
     end
 
     it "should treat paths with windows drive letters as absolute" do
-      path = VFS.resolve_path_url( "C:/foo/bar" )
-      path.should match /^vfs:\/C:\/foo\/bar$/
+      path = VFS.resolve_path_url( "c:/foo/bar" )
+      path.should match /^vfs:\/c:\/foo\/bar$/
     end
   end
 
