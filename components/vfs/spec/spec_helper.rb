@@ -18,6 +18,9 @@ def fix_windows_path(path)
 end
 
 TEST_DATA_BASE = 'target/test-data'
-TEST_DATA_DIR = fix_windows_path( File.expand_path( File.join( File.dirname(__FILE__), "/../#{TEST_DATA_BASE}" ) ) )
+test_data_dir = File.expand_path( File.join( File.dirname(__FILE__), "/../#{TEST_DATA_BASE}" ))
+puts "test_data_dir.1=#{test_data_dir}"
+TEST_DATA_DIR = fix_windows_path( test_data_dir )
+puts "TEST_DATA_DIR.1=#{TEST_DATA_DIR}"
 
 TESTING_ON_WINDOWS = ( java.lang::System.getProperty( "os.name" ) =~ /windows/i )

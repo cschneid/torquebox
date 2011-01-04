@@ -21,7 +21,12 @@ module VFS
     end
   
     def accepts(file)
+      #puts "accepts? #{file}"
       !!( file.path_name =~ @regexp )
+    end
+
+    def to_s
+      "[GlobFilter: @regxp=#{@regexp}]"
     end
   end
 end

@@ -8,18 +8,25 @@ describe "Dir extensions for VFS" do
     @executor = java.util.concurrent::Executors.newScheduledThreadPool( 1 )
     @temp_file_provider = org.jboss.vfs::TempFileProvider.create( "vfs-test", @executor )
 
-    @archive1_path = File.expand_path( "#{TEST_DATA_DIR}/home/larry/archive1.jar" )
+    @archive1_path = fix_windows_path( File.expand_path( "#{TEST_DATA_DIR}/home/larry/archive1.jar" ) )
+    puts "path.1.0=#{@archive1_path}"
     @archive1_file = org.jboss.vfs::VFS.child( @archive1_path )
+    puts "archive.1=#{@archive1_file}"
     @archive1_mount_point = org.jboss.vfs::VFS.child( @archive1_path )
+    puts "mount.1 = #{@archive1_mount_point}"
     @archive1_handle = org.jboss.vfs::VFS.mountZip( @archive1_file, @archive1_mount_point, @temp_file_provider )
 
     @archive2_path = "#{@archive1_path}/lib/archive2.jar"
     @archive2_file = org.jboss.vfs::VFS.child( @archive2_path )
     @archive2_mount_point = org.jboss.vfs::VFS.child( @archive2_path )
+    puts "mount.2 = #{@archive2_mount_point}"
     @archive2_handle = org.jboss.vfs::VFS.mountZip( @archive2_file, @archive2_mount_point, @temp_file_provider )
 
     @archive1_path = fix_windows_path( @archive1_path )
     @archive2_path = fix_windows_path( @archive2_path )
+
+    puts "archive1.path=#{@archive1_path}"
+    puts "archive2.path=#{@archive2_path}"
 
   end
 
@@ -36,7 +43,9 @@ describe "Dir extensions for VFS" do
       puts "######## START"
       puts "######## START"
       puts "######## START"
+      puts "######## PATTERN #{pattern}"
       items = Dir.glob( pattern )
+      puts "######## ITEMS #{items.inspect}"
       puts "######## END"
       puts "######## END"
       puts "######## END"

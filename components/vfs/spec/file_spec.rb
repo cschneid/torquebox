@@ -264,17 +264,19 @@ describe "File extensions for VFS" do
         contents.should eql( "howdy\n" )
       end
 
-       # move to kernel_spec
-      it "should allow writing with appending via open()" do
-        open( "#{prefix}/home/larry/file1.txt", (File::WRONLY | File::APPEND | File::CREAT) ) do |file|
-          file.puts "howdy"
+      # move to kernel_spec
+      unless (TESTING_ON_WINDOWS)
+        it "should allow writing with appending via open()" do
+          open( "#{prefix}/home/larry/file1.txt", (File::WRONLY | File::APPEND | File::CREAT) ) do |file|
+            file.puts "howdy"
+          end
+          contents = File.read( "#{prefix}/home/larry/file1.txt" )
+          contents.should eql( "This is file 1\nhowdy\n" )
+  
+          fs_file = File.join( File.dirname(__FILE__), '..', TEST_COPY_BASE, 'home/larry/file1.txt' )
+          fs_contents = File.read( fs_file )
+          fs_contents.should eql( "This is file 1\nhowdy\n" )
         end
-        contents = File.read( "#{prefix}/home/larry/file1.txt" )
-        contents.should eql( "This is file 1\nhowdy\n" )
-
-        fs_file = File.join( File.dirname(__FILE__), '..', TEST_COPY_BASE, 'home/larry/file1.txt' )
-        fs_contents = File.read( fs_file )
-        fs_contents.should eql( "This is file 1\nhowdy\n" )
       end
 
       it "should allow writing new files via File.open" do

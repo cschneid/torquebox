@@ -6,7 +6,7 @@ describe "VFS::Dir" do
   before(:each) do
     @executor = java.util.concurrent::Executors.newScheduledThreadPool( 1 )
     @temp_file_provider = org.jboss.vfs::TempFileProvider.create( "vfs-test", @executor )
-    @archive1_path = File.expand_path( "#{TEST_DATA_DIR}/home/larry/archive1.jar" )
+    @archive1_path = fix_windows_path( File.expand_path( "#{TEST_DATA_DIR}/home/larry/archive1.jar" ) )
     @archive1_file = org.jboss.vfs::VFS.child( @archive1_path )
     @archive1_mount_point = org.jboss.vfs::VFS.child( @archive1_path )
     @archive1_handle = org.jboss.vfs::VFS.mountZip( @archive1_file, @archive1_mount_point, @temp_file_provider )
@@ -43,6 +43,7 @@ describe "VFS::Dir" do
 
     it "should find vfs entries inside of archives" do
       path = "vfs:#{fix_windows_path(@archive1_path)}/other_lib/subdir"
+      puts "doing path #{path}"
       entries = VFS::Dir.new( path ).entries
       entries.size.should == 3
       entries.should include( "." )

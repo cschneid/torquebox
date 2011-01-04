@@ -111,8 +111,13 @@ class IO
       if ( name =~ /^\// || name =~ /^vfs:\// )
         full_path = name
       else
-        full_path = File.join( Dir.pwd, name )
+        pwd = Dir.pwd
+	if ( pwd =~ /^([a-zA-Z])(:.*)$/) 
+	  pwd = "/#{$1.downcase}#{$2}"
+	end
+        full_path = File.join( pwd, name )
       end
+      puts "FULL_PATH=#{full_path}"
       virtual_file = org.jboss.vfs.VFS.child( full_path )
       raise ::Errno::ENOENT.new( "#{name} (#{virtual_file})" ) unless virtual_file.exists()
 
