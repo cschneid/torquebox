@@ -24,6 +24,17 @@ describe "File extensions for VFS" do
     @archive2_file = org.jboss.vfs::VFS.child( @archive2_path )
     @archive2_mount_point = org.jboss.vfs::VFS.child( @archive2_path )
     @archive2_handle = org.jboss.vfs::VFS.mountZip( @archive2_file, @archive2_mount_point, @temp_file_provider )
+
+    @archive1_path = fix_windows_path( @archive1_path )
+    @archive2_path = fix_windows_path( @archive2_path )
+
+    @os_prefix = ''
+    @os_vfs_prefix = ''
+
+    if ( java.lang::System.getProperty( 'os.name' ) =~ /windows/i )
+      @os_prefix = 'c:'
+      @os_vfs_prefix = '/c:'
+    end
   end
 
   after(:each) do
@@ -33,7 +44,7 @@ describe "File extensions for VFS" do
 
 
   it "should report writable-ness for VFS urls" do
-    prefix = File.expand_path( File.join( File.dirname( __FILE__ ), '..', TEST_COPY_BASE ) )
+    prefix = fix_windows_path( File.expand_path( File.join( File.dirname( __FILE__ ), '..', TEST_COPY_BASE ) ) )
     url = "vfs:#{prefix}/home/larry/file1.txt"
     File.exists?( url ).should be_true
     File.exist?( url ).should be_true
@@ -42,30 +53,30 @@ describe "File extensions for VFS" do
 
   describe "expand_path" do
     it "should handle relative non-vfs path" do
-      File.expand_path("../foo", "/tmp/bar").should == "/tmp/foo"
+      File.expand_path("../foo", "#{@os_prefix}/tmp/bar").should == "#{@os_prefix}/tmp/foo"
     end
 
     it "should handle relative to vfs path" do
-      File.expand_path("../foo", "vfs:/tmp/bar").should == "vfs:/tmp/foo"
+      File.expand_path("../foo", "vfs:#{@os_vfs_prefix}/tmp/bar").should == "vfs:#{@os_vfs_prefix}/tmp/foo"
     end
 
     it "should expand paths relative to VFS urls as VFS" do
-      absolute = File.expand_path("db/development.sqlite3", "vfs:/path/to/app")
-      absolute.should eql("vfs:/path/to/app/db/development.sqlite3")
+      absolute = File.expand_path("db/development.sqlite3", "vfs:#{@os_vfs_prefix}/path/to/app")
+      absolute.should eql("vfs:#{@os_vfs_prefix}/path/to/app/db/development.sqlite3")
     end
 
     it "should expand paths relative to VFS pathnames as VFS" do
-      absolute = File.expand_path("db/development.sqlite3", Pathname.new("vfs:/path/to/app"))
-      absolute.should eql("vfs:/path/to/app/db/development.sqlite3")
+      absolute = File.expand_path("db/development.sqlite3", Pathname.new("vfs:#{@os_vfs_prefix}/path/to/app"))
+      absolute.should eql("vfs:#{@os_vfs_prefix}/path/to/app/db/development.sqlite3")
     end
 
     it "should expand absolute Pathname objects correctly" do
-      File.expand_path("vfs:/foo").should eql("vfs:/foo")
-      File.expand_path(Pathname.new("vfs:/foo")).should eql("vfs:/foo")
+      File.expand_path("vfs:#{@os_vfs_prefix}/foo").should eql("vfs:#{@os_vfs_prefix}/foo")
+      File.expand_path(Pathname.new("vfs:#{@os_vfs_prefix}/foo")).should eql("vfs:#{@os_vfs_prefix}/foo")
     end
 
     it "should return first path when given two vfs paths" do
-      File.expand_path("vfs:/tmp/foo", "vfs:/tmp/bar").should == "vfs:/tmp/foo"
+      File.expand_path("vfs:#{@os_vfs_prefix}/tmp/foo", "vfs:#{@os_vfs_prefix}/tmp/bar").should == "vfs:#{@os_vfs_prefix}/tmp/foo"
     end
   end
 
@@ -87,41 +98,43 @@ describe "File extensions for VFS" do
   it "should handle #'s in filenames properly" do
     prefix = File.expand_path( File.join( File.dirname( __FILE__ ), '..', TEST_COPY_BASE ) )
     File.file?( "#{prefix}/#bad-uri#" ).should be_true
-    File.file?( "vfs:#{prefix}/#bad-uri#" ).should be_true
-    File.file?( "vfs:#{prefix}/#missing#" ).should be_false
+    File.file?( "vfs:#{fix_windows_path( prefix )}/#bad-uri#" ).should be_true
+    File.file?( "vfs:#{fix_windows_path( prefix )}/#missing#" ).should be_false
   end
 
   it "should handle spaces in filenames properly" do
     prefix = File.expand_path( File.join( File.dirname( __FILE__ ), '..', TEST_COPY_BASE ) )
     File.file?( "#{prefix}/sound of music/flibbity jibbit" ).should be_true
-    File.file?( "vfs:#{prefix}/sound of music/flibbity jibbit" ).should be_true
-    File.file?( "vfs:#{prefix}/sound of music/flibberty gibbet" ).should be_false
+    File.file?( "vfs:#{fix_windows_path( prefix )}/sound of music/flibbity jibbit" ).should be_true
+    File.file?( "vfs:#{fix_windows_path( prefix )}/sound of music/flibberty gibbet" ).should be_false
   end
 
   it "should handle backslashes in filenames even though there's no good reason to use them regardless of platform" do
     filename = __FILE__.gsub("/","\\")
     File.readable?( filename ).should be_true
-    File.readable?( "vfs:#{filename}" ).should be_true
+    File.readable?( "vfs:#{fix_windows_path(filename)}" ).should be_true
   end
 
-  it "should be able to chmod real files with vfs urls" do
-    path = File.expand_path("foo")
-    begin
-      f = File.new(path, "w")
-      FileUtils.chmod( 0666, "vfs:#{path}")
-      m1 = f.stat.mode
-      FileUtils.chmod( 0644, "vfs:#{path}")
-      m2 = f.stat.mode
-      m1.should_not eql(m2)
-    ensure
-      File.delete(path) rescue nil
+  unless (TESTING_ON_WINDOWS )
+    it "should be able to chmod real files with vfs urls" do
+      path = fix_windows_path( File.expand_path("foo") )
+      begin
+        f = File.new(path, "w")
+        FileUtils.chmod( 0666, "vfs:#{path}")
+        m1 = f.stat.mode
+        FileUtils.chmod( 0644, "vfs:#{path}")
+        m2 = f.stat.mode
+        m1.should_not eql(m2)
+      ensure
+        File.delete(path) rescue nil
+      end
     end
   end
 
   it "should be able to read file after chmod from a stat" do
     # Similar to what Rails' File.atomic_write does (TORQUE-174)
-    p1 = "vfs:" + File.expand_path("p1")
-    p2 = "vfs:" + File.expand_path("p2")
+    p1 = "vfs:" + fix_windows_path( File.expand_path("p1") )
+    p2 = "vfs:" + fix_windows_path( File.expand_path("p2") )
     begin
       File.open(p1, "w") { }
       File.open(p2, "w") { }
@@ -132,25 +145,27 @@ describe "File extensions for VFS" do
     end
   end
 
-  it "should chmod inside vfs archive when directory mounted on filesystem" do
-    FileUtils.rm_rf "target/mnt"
-    archive = org.jboss.vfs::VFS.child( @archive1_path )
-    logical = archive.getChild( "lib" )
-    physical = java.io::File.new( "target/mnt" )
-    physical.mkdirs
-    mount = org.jboss.vfs::VFS.mountReal( physical, logical )
-    path = "#{@archive1_path}/lib/chmod_test"
-    begin
-      lambda {
-        f = File.new("target/mnt/chmod_test", "w" )
-        FileUtils.chmod( 0666, path )
-        m1 = f.stat.mode
-        FileUtils.chmod( 0755, path )
-        m2 = f.stat.mode
-        m1.should_not eql(m2)
-      }.should_not raise_error
-    ensure
-      mount.close
+  unless ( TESTING_ON_WINDOWS )
+    it "should chmod inside vfs archive when directory mounted on filesystem" do
+      FileUtils.rm_rf "target/mnt"
+      archive = org.jboss.vfs::VFS.child( @archive1_path )
+      logical = archive.getChild( "lib" )
+      physical = java.io::File.new( "target/mnt" )
+      physical.mkdirs
+      mount = org.jboss.vfs::VFS.mountReal( physical, logical )
+      path = "#{@archive1_path}/lib/chmod_test"
+      begin
+        lambda {
+          f = File.new("target/mnt/chmod_test", "w" )
+          FileUtils.chmod( 0666, path )
+          m1 = f.stat.mode
+          FileUtils.chmod( 0755, path )
+          m2 = f.stat.mode
+          m1.should_not eql(m2)
+        }.should_not raise_error
+      ensure
+        mount.close
+      end
     end
   end
 
@@ -205,25 +220,21 @@ describe "File extensions for VFS" do
         when :absolute
           prefix = File.expand_path( File.join( File.dirname( __FILE__ ), '..', TEST_COPY_BASE ) )
         when :vfs
-          prefix = "vfs:#{File.expand_path( File.join( File.dirname( __FILE__ ), '..', TEST_COPY_BASE ) )}"
+          prefix = "vfs:#{fix_windows_path( File.expand_path( File.join( File.dirname( __FILE__ ), '..', TEST_COPY_BASE ) ) )}"
       end
 
-      it "should provide size for normal files" do
-        s = File.size( "#{prefix}/home/larry/file1.txt" )
-        s.should_not be_nil
-        s.should be > 0
+      unless (TESTING_ON_WINDOWS )
+        it "should provide size for normal files" do
+          s = File.size( "#{prefix}/home/larry/file1.txt" )
+          s.should_not be_nil
+          s.should be > 0
+        end
       end
 
       it "should throw NOENT for size of non-existant files" do
         lambda {
           File.size( "#{prefix}/home/larry/NOT_REALLY_file1.txt" )
         }.should raise_error
-      end
-
-      it "should provide size? for normal files" do
-        s = File.size?( "#{prefix}/home/larry/file1.txt" )
-        s.should_not be_nil
-        s.should be > 0
       end
 
       it "should not throw NOENT for size? of non-existant files" do
@@ -238,11 +249,13 @@ describe "File extensions for VFS" do
         mtime.should_not be_nil
       end
 
-      it "should report writeable-ness for normal files" do
-        File.writable?( "#{prefix}/home/larry/file1.txt" ).should be_true
+      unless (TESTING_ON_WINDOWS)
+        it "should report writeable-ness for normal files" do
+          File.writable?( File.join( prefix, 'home', 'larry', 'file1.txt' ) ).should be_true
+        end
       end
 
-       # move to kernel_spec
+      # move to kernel_spec
       it "should allow writing with truncation via open()" do
         open( "#{prefix}/home/larry/file1.txt", (File::WRONLY | File::TRUNC | File::CREAT) ) do |file|
           file.puts "howdy"
@@ -276,7 +289,7 @@ describe "File extensions for VFS" do
         file = "#{prefix}/home/larry/file1.txt"
         stat = File.stat( file )
         stat.should_not be_nil
-        stat.mtime.should eql( File.mtime( file ) )
+        stat.mtime.to_s.should eql( File.mtime( file ).to_s )
       end
 
       it "should not return a stat for missing files" do
@@ -396,7 +409,7 @@ describe "File extensions for VFS" do
       path = File.expand_path("foo")
       begin
         File.new(path, "w")
-        vpath = "vfs:#{path}"
+        vpath = "vfs:#{fix_windows_path( path )}"
         mtime = File.mtime(vpath)
         File.utime( Time.now, mtime+1, vpath )
         mtime.should be < File.mtime(vpath)

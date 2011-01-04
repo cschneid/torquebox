@@ -50,7 +50,6 @@ module ::VFS
 	       self.resolve_path_url( ::Dir.pwd ) + '/'
              end
     result = "#{prefix}#{path}"
-    puts "#{path} -> #{result}"
     result
   end
 

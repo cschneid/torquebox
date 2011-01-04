@@ -20,8 +20,6 @@ describe "Dir extensions for VFS" do
 
     @archive1_path = fix_windows_path( @archive1_path )
     @archive2_path = fix_windows_path( @archive2_path )
-    puts "111: #{@archive1_path}"
-    puts "222: #{@archive2_path}"
 
   end
 

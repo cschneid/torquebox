@@ -61,11 +61,11 @@ class Dir
         #return paths
       #end
 
-      puts "base= #{base}"
+      #puts "base= #{base}"
 
       vfs_url, child_path = VFS.resolve_within_archive( base )
-      puts "vfs_url=#{vfs_url}"
-      puts "child_path=#{child_path}"
+      #puts "vfs_url=#{vfs_url}"
+      #puts "child_path=#{child_path}"
 
       return []       if vfs_url.nil?
       #puts "segments.size==base_segments.size? #{segments.size == base_segments.size}"
@@ -73,13 +73,13 @@ class Dir
 
       matcher_segments = segments - base_segments
       matcher = matcher_segments.join( '/' )
-      puts "matcher [#{matcher}]"
+      #puts "matcher [#{matcher}]"
 
       begin
-        puts "0 vfs_url=#{vfs_url}"
+        #puts "0 vfs_url=#{vfs_url}"
         starting_point = root = org.jboss.vfs::VFS.child( vfs_url )
         starting_point = root.get_child( child_path ) unless ( child_path.nil? || child_path == '' )
-        puts "B starting_point=#{starting_point.path_name}"
+        #puts "B starting_point=#{starting_point.path_name}"
         return [] if ( starting_point.nil? || ! starting_point.exists? )
         child_path = starting_point.path_name
         #puts "child- #{child_path}"
@@ -87,16 +87,16 @@ class Dir
           child_path = "#{child_path}/"
         end
         child_path = "" if child_path == "/"
-        puts "child_path=#{child_path}"
-        puts "base=#{base}"
+        #puts "child_path=#{child_path}"
+        #puts "base=#{base}"
         filter = VFS::GlobFilter.new( child_path, matcher )
-        puts "filter is #{filter}"
+        #puts "filter is #{filter}"
         paths = starting_point.getChildrenRecursively( filter ).collect{|e|
           #path_name = e.path_name
           path_name = e.getPathNameRelativeTo( starting_point )
-          puts "(collect) path_name=#{path_name}"
+          #puts "(collect) path_name=#{path_name}"
           result = ::File.join( base, path_name )
-          puts "(collect) result=#{result}"
+          #puts "(collect) result=#{result}"
           result
         }
         paths.each{|p| block.call(p)} if block
@@ -111,23 +111,23 @@ class Dir
       #real_path = path =~ /^vfs:/ ? path[4..-1] : path
       case ( path )
         when %r(^vfs:/([a-zA-Z]:.*)$)
-	  puts "windows absolute"
+	  #puts "windows absolute"
 	  real_path = $1
 	when %r(^vfs:(.*)$)
-	  puts "unix absolute"
+	  #puts "unix absolute"
 	  real_path = $1
 	else
-	  puts "otherwise!"
+	  #puts "otherwise!"
 	  real_path = path
       end
-      puts "REAL_PATH 1 #{real_path}"
+      #puts "REAL_PATH 1 #{real_path}"
       mkdir_before_vfs( real_path, mode )
     rescue Errno::ENOTDIR => e
-      puts "REAL_PATH 2 #{path}"
+      #puts "REAL_PATH 2 #{path}"
       path = VFS.writable_path_or_error( path, e )
       mkdir_before_vfs( path, mode )
     rescue Errno::ENOENT => e
-      puts "REAL_PATH 3 #{path}"
+      #puts "REAL_PATH 3 #{path}"
       path = VFS.writable_path_or_error( path, e )
       mkdir_before_vfs( path, mode )
     end

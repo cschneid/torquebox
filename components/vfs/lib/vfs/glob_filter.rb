@@ -17,7 +17,7 @@ module VFS
         regexp_str = "^#{regexp_str}$"
       end
       @regexp = Regexp.new( regexp_str ) 
-      puts "new glob filter: #{@regexp}"
+      #puts "new glob filter: #{@regexp}"
     end
   
     def accepts(file)
