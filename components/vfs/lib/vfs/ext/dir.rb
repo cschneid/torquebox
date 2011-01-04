@@ -89,11 +89,11 @@ class Dir
           child_path = "#{child_path}/"
         end
         child_path = "" if child_path == "/"
-        puts "child_path=#{child_path}"
+        #puts "child_path=#{child_path}"
         #puts "base=#{base}"
         filter = VFS::GlobFilter.new( child_path, matcher )
-        puts "starting_port #{starting_point}"
-        puts "filter is #{filter}"
+        #puts "starting_port #{starting_point}"
+        #puts "filter is #{filter}"
 
         #starting_point.getChildrenRecursively( VFS::DebugFilter.new )
 

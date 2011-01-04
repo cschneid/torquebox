@@ -29,7 +29,7 @@ public class RackRuntimeDeployerTest extends AbstractDeployerTestCase {
         this.os_prefix = "";
 
         if (System.getProperty("os.name").toLowerCase().matches(".*windows.*")) {
-            this.os_prefix = "/c:";
+            this.os_prefix = "/C:";
         }
     }
 

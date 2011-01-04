@@ -18,99 +18,103 @@ import org.torquebox.test.ruby.AbstractRubyTestCase;
 import org.torquebox.rack.metadata.RackApplicationMetaData;
 import org.torquebox.rails.metadata.RailsApplicationMetaData;
 
-
 public class RailsRuntimeInitializerTest extends AbstractRubyTestCase {
-	
-	private Ruby ruby;
 
-	@Before
-	public void setUp() throws Exception {
-		Class.forName(VFS.class.getName());
-		ruby = createRuby();
-	}
-	
-	@After
-	public void tearDown() throws Exception {
-		ruby.tearDown( false );
-		ruby = null;
-		System.gc();
-	}
+    private Ruby ruby;
 
-	@Test
-	public void testInitializeWithGems() throws Exception {
-		String railsRootStr = System.getProperty("user.dir")
-				+ "/src/test/rails/ballast";
-		String vfsRailsRootStr = "vfs:" + railsRootStr;
-		VirtualFile railsRoot = VFS.getChild(railsRootStr);
+    @Before
+    public void setUp() throws Exception {
+        Class.forName(VFS.class.getName());
+        ruby = createRuby();
+    }
 
-		System.err.println("railsRoot=" + railsRoot);
+    @After
+    public void tearDown() throws Exception {
+        ruby.tearDown(false);
+        ruby = null;
+        System.gc();
+    }
 
-		RailsRuntimeInitializer initializer = create( railsRoot, "development" );
+    @Test
+    public void testInitializeWithGems() throws Exception {
+        String railsRootStr = System.getProperty("user.dir") + "/src/test/rails/ballast";
+        String vfsRailsRootStr = null;
+        
+        
+        if ( railsRootStr.startsWith( "/" ) ) {
+            vfsRailsRootStr = "vfs:" + railsRootStr;
+        } else {
+            vfsRailsRootStr = "vfs:/" + railsRootStr;
+        }
+        
+        vfsRailsRootStr = vfsRailsRootStr.replaceAll( "\\\\", "/" );
+        VirtualFile railsRoot = VFS.getChild(railsRootStr);
 
-		initializer.initialize(ruby);
+        System.err.println("***** railsRoot=" + railsRoot);
 
-		RubyClass objectClass = (RubyClass) ruby.getClassFromPath("Object");
+        RailsRuntimeInitializer initializer = create(railsRoot, "development");
 
-		IRubyObject rubyRailsRoot = objectClass.getConstant("RAILS_ROOT");
-		assertNotNull(rubyRailsRoot);
-		assertNotNil(rubyRailsRoot);
-		assertEquals(vfsRailsRootStr, rubyRailsRoot.toString());
+        initializer.initialize(ruby);
 
-		IRubyObject rubyRailsEnv = objectClass.getConstant("RAILS_ENV");
-		assertNotNull(rubyRailsEnv);
-		assertNotNil(rubyRailsEnv);
-		assertEquals("development", rubyRailsEnv.toString());
-	}
+        RubyClass objectClass = (RubyClass) ruby.getClassFromPath("Object");
 
-	@Test(expected = RaiseException.class)
-	public void testUnknownModelsAreCorrectlyIdentified() throws Exception {
-		String railsRootStr = System.getProperty("user.dir")
-				+ "/src/test/rails/ballast";
-		VirtualFile railsRoot = VFS.getChild(railsRootStr);
+        IRubyObject rubyRailsRoot = objectClass.getConstant("RAILS_ROOT");
+        assertNotNull(rubyRailsRoot);
+        assertNotNil(rubyRailsRoot);
+        assertEquals(vfsRailsRootStr, rubyRailsRoot.toString());
 
-		RailsRuntimeInitializer initializer = create( railsRoot, "development" );
+        IRubyObject rubyRailsEnv = objectClass.getConstant("RAILS_ENV");
+        assertNotNull(rubyRailsEnv);
+        assertNotNil(rubyRailsEnv);
+        assertEquals("development", rubyRailsEnv.toString());
+    }
 
-		initializer.initialize(ruby);
+    @Test(expected = RaiseException.class)
+    public void testUnknownModelsAreCorrectlyIdentified() throws Exception {
+        String railsRootStr = System.getProperty("user.dir") + "/src/test/rails/ballast";
+        VirtualFile railsRoot = VFS.getChild(railsRootStr);
 
-		String script = "class Foo; def self.fetch(); NoSuchModel; end; end; Foo.fetch";
-		Object noSuchModel = ruby.evalScriptlet(script);
-	}
+        RailsRuntimeInitializer initializer = create(railsRoot, "development");
 
-	@Test
-	public void testModelsAreLoadable() throws Exception {
-		String railsRootStr = System.getProperty("user.dir")
-				+ "/src/test/rails/ballast";
-		VirtualFile railsRoot = VFS.getChild(railsRootStr);
+        initializer.initialize(ruby);
 
-		RailsRuntimeInitializer initializer = create( railsRoot, "development" );
+        String script = "class Foo; def self.fetch(); NoSuchModel; end; end; Foo.fetch";
+        Object noSuchModel = ruby.evalScriptlet(script);
+    }
 
-		initializer.initialize(ruby);
+    @Test
+    public void testModelsAreLoadable() throws Exception {
+        String railsRootStr = System.getProperty("user.dir") + "/src/test/rails/ballast";
+        VirtualFile railsRoot = VFS.getChild(railsRootStr);
 
-		RubyModule bookModel = ruby.getClassFromPath("Book");
-		assertNotNil(bookModel);
-	}
+        RailsRuntimeInitializer initializer = create(railsRoot, "development");
 
-	@Test
-	public void testOpenSSL_HMAC_digest() throws Exception {
-		String railsRootStr = System.getProperty("user.dir")
-				+ "/src/test/rails/ballast";
-		VirtualFile railsRoot = VFS.getChild(railsRootStr);
-		RailsRuntimeInitializer initializer = create( railsRoot, "development" );
+        initializer.initialize(ruby);
 
-		initializer.initialize(ruby);
+        RubyModule bookModel = ruby.getClassFromPath("Book");
+        assertNotNil(bookModel);
+    }
 
-		String script = "require 'openssl'\nOpenSSL::HMAC.hexdigest(OpenSSL::Digest::SHA1.new, 'mykey', 'hashme')";
-		Object result = ruby.evalScriptlet(script);
+    @Test
+    public void testOpenSSL_HMAC_digest() throws Exception {
+        String railsRootStr = System.getProperty("user.dir") + "/src/test/rails/ballast";
+        VirtualFile railsRoot = VFS.getChild(railsRootStr);
+        RailsRuntimeInitializer initializer = create(railsRoot, "development");
 
-		System.err.println("result=" + result);
-	}
+        initializer.initialize(ruby);
+
+        String script = "require 'openssl'\nOpenSSL::HMAC.hexdigest(OpenSSL::Digest::SHA1.new, 'mykey', 'hashme')";
+        Object result = ruby.evalScriptlet(script);
+
+        System.err.println("result=" + result);
+    }
 
     @Test
     public void testAutoloadPathsAvailableAsRubyConstant() throws Exception {
         String path = System.getProperty("user.dir") + "/src/test/rails/ballast";
         VirtualFile root = VFS.getChild(path);
 
-        RailsRuntimeInitializer initializer = create( root, "development" );
+        RailsRuntimeInitializer initializer = create(root, "development");
         initializer.addAutoloadPath("path1");
         initializer.addAutoloadPath("path2");
 
@@ -122,10 +126,10 @@ public class RailsRuntimeInitializerTest extends AbstractRubyTestCase {
         assertNotNull(autoloadPaths);
 
         List<String> paths = (List<String>) JavaEmbedUtils.rubyToJava(autoloadPaths);
-        assertTrue(paths.size()==2);
+        assertTrue(paths.size() == 2);
         assertTrue(paths.contains("path1"));
         assertTrue(paths.contains("path2"));
-        
+
         String load_paths = "" + ruby.evalScriptlet("ActiveSupport::Dependencies.load_paths.join(',')");
         assertTrue(load_paths.endsWith(",path1,path2"));
     }
@@ -134,7 +138,7 @@ public class RailsRuntimeInitializerTest extends AbstractRubyTestCase {
         RackApplicationMetaData rackMetaData = new RackApplicationMetaData();
         rackMetaData.setRackRoot(root);
         rackMetaData.setRackEnv(env);
-        RailsApplicationMetaData railsMetaData = new RailsApplicationMetaData( rackMetaData );
-        return new RailsRuntimeInitializer( railsMetaData );
+        RailsApplicationMetaData railsMetaData = new RailsApplicationMetaData(rackMetaData);
+        return new RailsRuntimeInitializer(railsMetaData);
     }
 }
