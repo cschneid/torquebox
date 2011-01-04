@@ -64,6 +64,10 @@ public class TorqueBoxYamlParserTest {
     @Test 
     public void testLenientRootKeys() throws Exception {
         String root = "/test";
+        
+        if ( System.getProperty( "os.name" ).toLowerCase().matches(".*windows.*" ) ) {
+        	root = "/C:" + root;
+        }
         strings.put("RACK_ROOT", root);
         assertEquals( root, parser.parseApplication(strings).getRackRoot().getPathName() );
         setUp(); strings.put("RAILS_ROOT", root);
