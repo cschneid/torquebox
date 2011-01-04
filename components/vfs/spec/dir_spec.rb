@@ -18,6 +18,10 @@ describe "Dir extensions for VFS" do
     @archive2_mount_point = org.jboss.vfs::VFS.child( @archive2_path )
     @archive2_handle = org.jboss.vfs::VFS.mountZip( @archive2_file, @archive2_mount_point, @temp_file_provider )
 
+    @archive1_path = fix_windows_path( @archive1_path )
+    @archive2_path = fix_windows_path( @archive2_path )
+    puts "111: #{@archive1_path}"
+    puts "222: #{@archive2_path}"
 
   end
 
@@ -29,7 +33,17 @@ describe "Dir extensions for VFS" do
   describe "with vfs urls" do
     it "should allow globbing within archives with explicit vfs" do
       pattern = "vfs:#{@archive1_path}/*"
+      puts "######## START"
+      puts "######## START"
+      puts "######## START"
+      puts "######## START"
+      puts "######## START"
       items = Dir.glob( pattern )
+      puts "######## END"
+      puts "######## END"
+      puts "######## END"
+      puts "######## END"
+      puts "######## END"
       items.should_not be_empty
       items.should include File.join( "vfs:#{@archive1_path}", 'web.xml' )
       items.should include File.join( "vfs:#{@archive1_path}", 'lib' )
@@ -57,9 +71,9 @@ describe "Dir extensions for VFS" do
         when :relative
           prefix = "./#{TEST_DATA_BASE}"
         when :absolute
-          prefix = File.expand_path( File.join( File.dirname( __FILE__ ), '..', TEST_DATA_BASE ) )
+          prefix = fix_windows_path( File.expand_path( File.join( File.dirname( __FILE__ ), '..', TEST_DATA_BASE ) ) )
         when :vfs
-          prefix = "vfs:" + File.expand_path( File.join( File.dirname( __FILE__ ), '..', TEST_DATA_BASE ) )
+          prefix = "vfs:" + fix_windows_path( File.expand_path( File.join( File.dirname( __FILE__ ), '..', TEST_DATA_BASE ) ) )
       end
 
       it "should ignore dotfiles by default" do
@@ -156,6 +170,7 @@ describe "Dir extensions for VFS" do
 
       it "should determine if VFS is needed for nested archives" do
         base = "#{prefix}/home/larry/archive1.jar/lib/archive2.jar"
+	puts "glob against #{base}"
         items = Dir.glob( "#{base}/*" )
         items.should_not be_empty
         items.should include( "#{base}/manifest.txt" )
@@ -240,9 +255,13 @@ describe "Dir extensions for VFS" do
       physical = java.io::File.new( "target/mnt" )
       physical.mkdirs
       mount = org.jboss.vfs::VFS.mountReal( physical, logical )
+      prefix = @archive1_path
+      if ( prefix =~ %r(^/([a-zA-Z]:.*)$) )
+        prefix = $1
+      end
       begin
         lambda {
-          Dir.mkdir("#{@archive1_path}/lib/should_mkdir_inside_vfs_archive")
+          Dir.mkdir("#{prefix}/lib/should_mkdir_inside_vfs_archive")
           File.directory?("target/mnt/should_mkdir_inside_vfs_archive").should be_true
         }.should_not raise_error
       ensure
@@ -250,5 +269,6 @@ describe "Dir extensions for VFS" do
       end
     end
   end
+
 
 end

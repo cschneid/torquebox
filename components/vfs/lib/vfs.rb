@@ -38,15 +38,20 @@ module ::VFS
   end
 
   def self.resolve_path_url(path)
+    path = path.dup
     prefix = case
              when path =~ /^\//            # unix absolute
                "vfs:"
-             when path =~ /^[[:alpha:]]:/  # windows absolute
+             when path =~ /^([[:alpha:]])(:.*)$/  # windows absolute
+	       path = "#{$1.downcase}#{$2}"
                "vfs:/"
              else
-               "vfs:#{::Dir.pwd}/"         # relative
+               #"vfs:#{::Dir.pwd}/"         # relative
+	       self.resolve_path_url( ::Dir.pwd ) + '/'
              end
-    "#{prefix}#{path}"
+    result = "#{prefix}#{path}"
+    puts "#{path} -> #{result}"
+    result
   end
 
   def self.virtual_file(filename)
