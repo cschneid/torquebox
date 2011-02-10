@@ -87,14 +87,17 @@
       <version>0.4.0</version>
       <type>gem</type>
       <scope>test</scope>
+<!--
       <exclusions>
         <exclusion>
           <groupId>rubygems</groupId>
           <artifactId>ffi</artifactId>
         </exclusion>
       </exclusions>
+-->
     </dependency>
 
+<!--
     <dependency>
       <groupId>rubygems</groupId>
       <artifactId>ffi</artifactId>
@@ -102,6 +105,7 @@
       <type>gem</type>
       <scope>test</scope>
     </dependency>
+-->
 
     <dependency>
       <groupId>org.torquebox</groupId>
@@ -185,7 +189,7 @@
             <groupId>de.saumya.mojo</groupId>
             <artifactId>rspec-maven-plugin</artifactId>
             <configuration>
-	      <jrubyFork>false</jrubyFork>
+	      <jrubyFork>true</jrubyFork>
             </configuration>
           </plugin>
         </plugins>

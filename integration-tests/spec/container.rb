@@ -71,6 +71,7 @@ ArquillianMethods::Configurator.configure do |config|
   config.before(:all) do
     if (self.class.respond_to? :create_deployment)
       @real_java_class = self.class.become_java!  # ('.') 
+      puts "#{self.class} ===> #{@real_java_class}"
       Thread.current[:test_runner_adaptor].beforeClass(@real_java_class)
     end
   end

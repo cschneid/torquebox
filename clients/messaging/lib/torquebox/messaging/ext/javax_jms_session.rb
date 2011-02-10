@@ -52,8 +52,8 @@ module javax.jms::Session
     reply_receiver = createConsumer( reply_queue )
 
     jms_message = createTextMessage
-    jms_message.jmsreply_to = reply_queue
-    jms_message.jmsdelivery_mode = Java::javax.jms.DeliveryMode.NON_PERSISTENT
+    jms_message.jms_reply_to = reply_queue
+    jms_message.jms_delivery_mode = Java::javax.jms.DeliveryMode.NON_PERSISTENT
     jms_message.encode message
 
     request_producer.send( jms_message )

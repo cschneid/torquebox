@@ -98,7 +98,7 @@ module TorqueBox
       def receive_and_publish(options={})
         request = receive(options.merge(:decode => false))
         unless request.nil?
-          reply_to = request.jmsreply_to
+          reply_to = request.jms_reply_to
           request_payload = request.decode
           response = block_given? ? yield(request_payload) : request_payload
 

@@ -21,6 +21,7 @@ public class BasicTest extends AbstractIntegrationTestCase {
     @Test
     public void testHighLevel() {
         driver.get( "http://localhost:8080/basic-rails" );
+        System.err.println( driver.getPageSource() );
         WebElement element = driver.findElementById( "success" );
         assertNotNull( element );
         assertEquals( "basic-rails", element.getAttribute( "class" ) );

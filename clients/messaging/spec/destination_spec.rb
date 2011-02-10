@@ -103,7 +103,7 @@ describe TorqueBox::Messaging::Destination do
   describe "sending and receiving" do
     before(:each) do
       @container = TorqueBox::Container::Foundation.new
-      @container.enable( TorqueBox::Naming::NamingService ) {|config| config.export=false}
+      @container.enable( TorqueBox::Naming::NamingService ) {|config| config.export=true}
       @container.enable( TorqueBox::Messaging::MessageBroker )
       @container.start
     end
