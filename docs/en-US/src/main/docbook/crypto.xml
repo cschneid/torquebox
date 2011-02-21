@@ -34,7 +34,7 @@ keystore:
   password: foobar</screen></para>
       </example></para>
 
-    <para>Each keystore is labelled with an identifier used to access it from
+    <para>Each keystore is labeled with an identifier used to access it from
     other services. While any number of key stores may be configured with
     arbitrary identifiers, many services look for specific key stores by
     default.</para>
